@@ -2,7 +2,7 @@
 
 ## 支持站点：
 
-- 开源中国 ( `oschina.com` ) 动弹图片、头像
+- 开源中国 ( `oschina.net` ) 动弹图片、头像
 - 知乎 ( `zhihu.com` ) 头像
 - 豆瓣 ( `douban.com` ) 头像
 

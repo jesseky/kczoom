@@ -23,13 +23,14 @@ var Querys = [
   },
   {
     title: 'zhihu',
-    query: '.zhi .avatar, .zhi .Avatar, .zhi .zm-item-img-avatar',
+    query: '.zhi .avatar, .zhi .Avatar, .zhi .zm-item-img-avatar, .avatar.avatar-small, .author .avatar-small',
     from: /_[sl]|_xs/,
     to: ''
   },
   {
     title: 'douban',
-    query: '.user-face .pil, .obu .nbg .m_sub_img, #db-usr-profile .pic img, .basic-info .userface, .member-list .pic img.imgnoga, .comment-item .pic img',
+    //query: '.user-face .pil, .obu .nbg .m_sub_img, #db-usr-profile .pic img, .basic-info .userface, .member-list .pic img.imgnoga, .comment-item .pic img, #friend .list img.show-title, .status-item .usr-pic a img, .mod-usercard .pic a img',
+    query: 'img[src*=".doubanio.com/icon/u"]:not(.kcimage-content-img)',
     from: /icon\/u[a-z]?/,
     to: 'icon/ur',
     to2: 'icon/ul',
@@ -54,9 +55,10 @@ function kcLoadImage(ImgCon, img, source, callback, callerror) {
     kcHideOrShowLoading();
     img.setAttribute('src', source);
     img.classList.add('kcimage-zoom-out');
-    if (load.height > ImgCon.offsetHeight) {
+    var h = (load.naturalWidth > ImgCon.offsetWidth ? ImgCon.offsetWidth / load.naturalWidth : 1) * load.naturalHeight;
+    if (h > ImgCon.offsetHeight) {
       ImgCon.querySelector('section').classList.add('kcimage-content-cont-block');
-      ImgCon.querySelector('section').scrollTop = (load.height - ImgCon.offsetHeight) / 2;
+      ImgCon.querySelector('section').scrollTop = (h - ImgCon.offsetHeight) / 2;
     }
     setTimeout(function() {
       img.classList.add('kc-bounceIn');
@@ -106,10 +108,10 @@ function kcLoadSourceImage(elm, iq) {
   ImgCon.style.display = 'block';
   img.src = elm.src;
   img.classList.remove('kcimage-zoom-out');
-  kcLoadImage(ImgCon, img, elm.src.replace(iq.from, iq.to), function() {
+  kcLoadImage(ImgCon, img, iq.from ? elm.src.replace(iq.from, iq.to || '') : elm.src, function() {
     // success;
   }, function() {
-    if (iq.to2) {
+    if (iq.from && typeof iq.to2 !== 'undefined') {
       kcLoadImage(ImgCon, img, elm.src.replace(iq.from, iq.to2), function() {
         //success;
       }, function() {

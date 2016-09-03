@@ -4,7 +4,12 @@
     "version": "1.0",
     "description": "图片放大查看",
     "content_scripts": [{
-        "matches": ["http://*.oschina.net/*", "https://*.oschina.net/*", "https://*.zhihu.com/*", "https://*.douban.com/*"],
+        "matches": [
+            "http://*.oschina.net/*",
+            "https://*.oschina.net/*",
+            "https://*.zhihu.com/*",
+            "https://*.douban.com/*"
+        ],
         "css": ["content.css"],
         "js": ["content.js"],
         "run_at": "document_end"
@@ -19,6 +24,6 @@
         "128": "zoom_in.png"
     },
     "permissions": [
-		    "activeTab"
+        "activeTab"
     ]
 }
