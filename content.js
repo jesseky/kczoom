@@ -10,21 +10,27 @@
 var Querys = [
   {
     title: 'oschina',
-    query: '.logs .tweet .img img, .UserLogs .photo img',
+    query: '.logs .tweet .img img, .UserLogs .photo img, .multimgs img',
     from: '_thumb',
     to: ''
   },
   {
     title: 'oschina',
-    query: '.SmallPortrait,.LargePortrait,.tweet-vote-user img,.user-icon img',
+    query: '.SmallPortrait,.LargePortrait,.tweet-vote-user img,.user-icon img, .tweet-portrait, .portrait',
     from: /_\d+/,
     to: '_200',
     to2: '_100'
   },
   {
+    title: 'oschina',
+    query: 'img.multing',
+    from: '(V)',
+    to: ''
+  },
+  {
     title: 'zhihu',
-    query: '.zhi .avatar, .zhi .Avatar, .zhi .zm-item-img-avatar, .avatar.avatar-small, .author .avatar-small',
-    from: /_[sl]|_xs/,
+    query: '.zhi .avatar, .zhi .Avatar, .zhi .zm-item-img-avatar, .avatar.avatar-small, .author .avatar-small, .Avatar',
+    from: /_[msl]|_xs|_xl|_is|_im/,
     to: ''
   },
   {
@@ -125,11 +131,12 @@ function kcLoadSourceImage(elm, iq) {
 function kcBindAllEvents() {
   Querys.forEach(function(iq) {
     [...document.querySelectorAll(iq.query)].filter(el => !el.kcBoundEvent).forEach(function(elm) {
-      elm.kcBoundEvent = true;
-      elm.style.cursor = 'zoom-in';
-      elm.classList.add('kcimage-zoom');
-      elm.addEventListener('click', function(evt) {
-        kcLoadSourceImage(elm, iq);
+      let img = elm.nodeName.toUpperCase() === 'IMG' ? elm : elm.querySelector('img');
+      img.kcBoundEvent = true;
+      img.style.cursor = 'zoom-in';
+      img.classList.add('kcimage-zoom');
+      img.addEventListener('click', function(evt) {
+        kcLoadSourceImage(img, iq);
         evt.preventDefault();
         evt.stopPropagation();
       }, true);
