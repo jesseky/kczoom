@@ -16,7 +16,7 @@ var Querys = [
   },
   {
     title: 'oschina',
-    query: '.SmallPortrait,.LargePortrait,.tweet-vote-user img,.user-icon img, .tweet-portrait, .portrait',
+    query: '.SmallPortrait,.LargePortrait,.tweet-vote-user img,.user-icon img, .tweet-portrait, .portrait, img.voter',
     from: /_\d+/,
     to: '_200',
     to2: '_100'
