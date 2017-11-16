@@ -15,7 +15,7 @@ var Querys = [{
   },
   {
     url: 'oschina.net',
-    query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter',
+    query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter, .tweet .tweet-uimg',
     from: /_\d+/,
     to: '_200',
     to2: '_100'
@@ -28,7 +28,7 @@ var Querys = [{
   },
   {
     url: 'zhihu.com',
-    query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar',
+    query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar, .Avatar--xs',
     from: /_[msl]|_xs|_xl|_is|_im/,
     to: ''
   },
