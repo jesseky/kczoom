@@ -5,6 +5,7 @@
 - 开源中国 ( `oschina.net` ) 动弹图片、头像
 - 知乎 ( `zhihu.com` ) 头像
 - 豆瓣 ( `douban.com` ) 头像
+- 简书 ( `jianshu.com` ) 头像、封面
 
 ## 使用说明：
 
