@@ -39,6 +39,12 @@ var Querys = [{
     from: /icon\/u[a-z]?/,
     to: 'icon/ur',
     to2: 'icon/ul',
+  },
+  {
+    url: 'jianshu.com',
+    query: '.avatar img,.cover img,.avatar[style*="background-image"]',
+    from: /\?.*$/,
+    to: ''
   }
 ];
 var ImgCon = null;
@@ -113,17 +119,25 @@ function kcLoadSourceImage(elm, iq) {
   } else {
     img = ImgCon.querySelector('img');
   }
+  var url = elm.src || window.getComputedStyle(elm).backgroundImage || '';
+  if(!url){
+    return;
+  }
+  var mch = url.match(/^url\("(.*)"\)$/);
+  if ( null !== mch) {
+    url = mch[1];
+  }
   kcHideOrShowLoading('show');
   ImgCon.querySelector('section').classList.remove('kcimage-content-cont-block');
   ImgCon.querySelector('section').scrollTop = 0;
   ImgCon.style.display = 'block';
-  img.src = elm.src;
+  img.src = url;
   img.classList.remove('kcimage-zoom-out');
-  kcLoadImage(ImgCon, img, iq.from ? elm.src.replace(iq.from, iq.to || '') : elm.src, function () {
+  kcLoadImage(ImgCon, img, iq.from ? url.replace(iq.from, iq.to || '') : url, function () {
     // success;
   }, function () {
     if (iq.from && typeof iq.to2 !== 'undefined') {
-      kcLoadImage(ImgCon, img, elm.src.replace(iq.from, iq.to2), function () {
+      kcLoadImage(ImgCon, img, url.replace(iq.from, iq.to2), function () {
         //success;
       }, function () {
         kcHideOrShowLoading();
