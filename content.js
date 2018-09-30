@@ -204,7 +204,7 @@ function kcBindAllEvents() {
             var div = document.createElement('div');
             div.className = 'kc-decoded';
             div.innerHTML = decdoms;
-            dom.parentNode.appendChild(div);
+            dom.nextSibling ? dom.parentNode.insertBefore(div, dom.nextSibling) : dom.parentNode.appendChild(div);
           }
         }
       });
