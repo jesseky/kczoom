@@ -9,13 +9,13 @@
 // bind click image event
 var Querys = [{
     url: 'oschina.net',
-    query: '.logs .tweet .img img, .UserLogs .photo img, .multimgs img',
-    from: '_thumb',
+    query: '.logs .tweet .img img, .UserLogs .photo img, .multimgs img, .osc-avatar img[src*="!/both/"]',
+    from: /_thumb|!\/.*$/,
     to: ''
   },
   {
     url: 'oschina.net',
-    query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter, .tweet .tweet-uimg',
+    query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter, .tweet .tweet-uimg, .osc-avatar img[src*="_50."]',
     from: /_\d+/,
     to: '_200',
     to2: '_100'
@@ -28,9 +28,14 @@ var Querys = [{
   },
   {
     url: 'zhihu.com',
-    query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar, .Avatar--xs',
-    from: /_[msl]|_xs|_xl|_is|_im/,
-    to: ''
+    query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar, .Avatar--xs,.RichContent-cover-inner img',
+    from: /_[msl]|_xs|_xl|_is|_im|_\d+x\d+/,
+    to: '',
+    style: {
+      '.RichContent-cover-inner': {
+        zIndex: 2
+      }
+    }
   },
   {
     url: 'douban.com',
@@ -42,11 +47,15 @@ var Querys = [{
   },
   {
     url: 'jianshu.com',
-    query: '.avatar img,.cover img,.avatar[style*="background-image"]',
+    query: '.avatar img,.cover img,.wrap-img img,.avatar-collection img,.avatar[style*="background-image"],.cover[style*="background-image"]',
     from: /\?.*$/,
     to: ''
   }
 ];
+var Decodes = {
+  'oschina.net': '.comment-item .extra.text, .tweet-item .extra.text'
+};
+
 var ImgCon = null;
 var CurrentURL = document.location.href;
 var MutationOb = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver; // moz is not required
@@ -120,11 +129,11 @@ function kcLoadSourceImage(elm, iq) {
     img = ImgCon.querySelector('img');
   }
   var url = elm.src || window.getComputedStyle(elm).backgroundImage || '';
-  if(!url){
+  if (!url) {
     return;
   }
   var mch = url.match(/^url\("(.*)"\)$/);
-  if ( null !== mch) {
+  if (null !== mch) {
     url = mch[1];
   }
   kcHideOrShowLoading('show');
@@ -148,9 +157,19 @@ function kcLoadSourceImage(elm, iq) {
   });
 }
 
+function b64DecodeUnicode(str) {
+  try {
+    return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    }).join(''));
+  } catch (e) {
+    return '';
+  }
+}
+
 function kcBindAllEvents() {
   Querys.filter(iq => CurrentURL.indexOf(iq.url) > -1).forEach(function (iq) {
-    [...document.querySelectorAll(iq.query.split(',').map(i=>i+":not(.kcimage-zoom)").join(','))].forEach(function (img) {
+    [...document.querySelectorAll(iq.query.split(',').map(i => i + ":not(.kcimage-zoom)").join(','))].forEach(function (img) {
       img.kcBoundEvent = true;
       img.style.cursor = 'zoom-in';
       img.classList.add('kcimage-zoom');
@@ -160,7 +179,37 @@ function kcBindAllEvents() {
         evt.stopPropagation();
       }, true);
     });
+    if (iq.style) {
+      for (var q in iq.style) {
+        [...document.querySelectorAll(q)].filter(e => !e.kcSettedStyle).forEach(function (el) {
+          for (var k in iq.style[q]) {
+            el.style[k] = iq.style[q][k];
+          }
+          el.kcSettedStyle = true;
+        });
+      }
+    }
   });
+  for (let u in Decodes) {
+    if (CurrentURL.indexOf(u) > -1) {
+      [...document.querySelectorAll(Decodes[u])].forEach(dom => {
+        if (!dom.KCDecoded) {
+          dom.KCDecoded = true;
+          var content = dom.textContent || dom.innerText || '';
+          var decdoms = content.split(/[\s\t\n]+/).filter(v => /^[a-zA-Z0-9_\-\/=\+]{3,}$/.test(v)).map(v => {
+            var t = b64DecodeUnicode(v);
+            return t ? `<section class="kc-decoded-item"><blockquote>${v}</blockquote><p>${t}</p></section>` : '';
+          }).join('');
+          if (decdoms) {
+            var div = document.createElement('div');
+            div.className = 'kc-decoded';
+            div.innerHTML = decdoms;
+            dom.parentNode.appendChild(div);
+          }
+        }
+      });
+    }
+  }
 }
 kcBindAllEvents();
 
