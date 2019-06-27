@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "KC-Zoom",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "豆瓣、知乎等头像放大查看插件",
     "content_scripts": [{
         "matches": [
