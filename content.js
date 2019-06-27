@@ -8,49 +8,49 @@
 
 // bind click image event
 var Querys = [{
-    url: 'oschina.net',
-    query: '.logs .tweet .img img, .UserLogs .photo img, .multimgs img, .osc-avatar img[src*="!/both/"]',
-    from: /_thumb|!\/.*$/,
-    to: ''
-  },
-  {
-    url: 'oschina.net',
-    query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter, .tweet .tweet-uimg, .osc-avatar img[src*="_50."]',
-    from: /_\d+/,
-    to: '_200',
-    to2: '_100'
-  },
-  {
-    url: 'oschina.net',
-    query: 'img.multing',
-    from: '(V)',
-    to: ''
-  },
-  {
-    url: 'zhihu.com',
-    query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar, .Avatar--xs,.RichContent-cover-inner img',
-    from: /_[msl]|_xs|_xl|_is|_im|_\d+x\d+/,
-    to: '',
-    style: {
-      '.RichContent-cover-inner': {
-        zIndex: 2
-      }
+  url: 'oschina.net',
+  query: '.logs .tweet .img img, .UserLogs .photo img, .multimgs img, .osc-avatar img[src*="!/both/"]',
+  from: /_thumb|!\/.*$/,
+  to: ''
+},
+{
+  url: 'oschina.net',
+  query: 'img.SmallPortrait, img.LargePortrait, .tweet-vote-user img,.user-icon img, img.tweet-portrait, img.portrait, img.voter, .tweet .tweet-uimg, .osc-avatar img[src*="_50."]',
+  from: /_\d+/,
+  to: '_200',
+  to2: '_100'
+},
+{
+  url: 'oschina.net',
+  query: 'img.multing',
+  from: '(V)',
+  to: ''
+},
+{
+  url: 'zhihu.com',
+  query: '.zhi img.avatar, .zhi img.Avatar, .zhi img.side-topic-avatar, .zhi img.zm-item-img-avatar, img.avatar.avatar-small, .author img.avatar-small, img.Avatar, .Avatar--xs,.RichContent-cover-inner img',
+  from: /_[msl]|_xs|_xl|_is|_im|_\d+x\d+/,
+  to: '',
+  style: {
+    '.RichContent-cover-inner': {
+      zIndex: 2
     }
-  },
-  {
-    url: 'douban.com',
-    //query: '.user-face .pil, .obu .nbg .m_sub_img, #db-usr-profile .pic img, .basic-info .userface, .member-list .pic img.imgnoga, .comment-item .pic img, #friend .list img.show-title, .status-item .usr-pic a img, .mod-usercard .pic a img',
-    query: 'img[src*=".doubanio.com/icon/u"]:not(.kcimage-content-img)',
-    from: /icon\/u[a-z]?/,
-    to: 'icon/ur',
-    to2: 'icon/ul',
-  },
-  {
-    url: 'jianshu.com',
-    query: '.avatar img,.cover img,.wrap-img img,.avatar-collection img,.avatar[style*="background-image"],.cover[style*="background-image"]',
-    from: /\?.*$/,
-    to: ''
   }
+},
+{
+  url: 'douban.com',
+  //query: '.user-face .pil, .obu .nbg .m_sub_img, #db-usr-profile .pic img, .basic-info .userface, .member-list .pic img.imgnoga, .comment-item .pic img, #friend .list img.show-title, .status-item .usr-pic a img, .mod-usercard .pic a img',
+  query: 'img[src*=".doubanio.com/icon/u"]:not(.kcimage-content-img)',
+  from: /icon\/u[a-z]?/,
+  to: 'icon/ur',
+  to2: 'icon/ul',
+},
+{
+  url: 'jianshu.com',
+  query: '.avatar img,.cover img,.wrap-img img,.avatar-collection img,.avatar[style*="background-image"],.cover[style*="background-image"]',
+  from: /\?.*$/,
+  to: ''
+}
 ];
 var Decodes = {
   'oschina.net': '.comment-item .extra.text, .tweet-item .extra.text'
@@ -167,6 +167,19 @@ function b64DecodeUnicode(str) {
   }
 }
 
+function isbase64(v) {
+  return /^[a-zA-Z0-9_\-\/=\+]{5,}$/.test(v.trim());
+}
+
+function b64DecodeInfinity(str) {
+  let [n, m, s, p] = [0, 1e3, '', str];
+  do {
+    p = b64DecodeUnicode(p);
+    if (p) { s = p; n++; }
+  } while (p && isbase64(p) && n < m);
+  return [s, n];
+}
+
 function kcBindAllEvents() {
   Querys.filter(iq => CurrentURL.indexOf(iq.url) > -1).forEach(function (iq) {
     [...document.querySelectorAll(iq.query.split(',').map(i => i + ":not(.kcimage-zoom)").join(','))].forEach(function (img) {
@@ -196,9 +209,9 @@ function kcBindAllEvents() {
         if (!dom.KCDecoded) {
           dom.KCDecoded = true;
           var content = dom.textContent || dom.innerText || '';
-          var decdoms = content.split(/[\s\t\n]+/).filter(v => /^[a-zA-Z0-9_\-\/=\+]{3,}$/.test(v)).map(v => {
-            var t = b64DecodeUnicode(v);
-            return t ? `<section class="kc-decoded-item"><blockquote>${v}</blockquote><p>${t}</p></section>` : '';
+          var decdoms = content.split(/[\s\t\n]+/).filter(v => /^[a-zA-Z0-9_\-\/=\+]{5,}$/.test(v)).map(v => {
+            let [t, n] = b64DecodeInfinity(v); // b64DecodeUnicode(v); // 支持无限 base64 解码
+            return t ? `<section class="kc-decoded-item"><blockquote>${v}</blockquote><strong>${n}次</strong><p>${t}</p></section>` : '';
           }).join('');
           if (decdoms) {
             var div = document.createElement('div');

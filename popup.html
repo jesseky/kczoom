@@ -8,6 +8,12 @@
 		h1{border-bottom: 1px solid #CCC; line-height: 2em;}
 		article div{margin: 10px 0; line-height: 1.5em;}
 		footer{color: #999;}
+		.flex-wp{display: flex; justify-content: space-between;}
+		.text,textarea{outline: none; border: 1px solid #e8e8e8; border-radius: 3px; line-height: 20px; padding: 3px 8px; box-sizing: border-box;}
+		.text:focus,textarea:focus{border:1px solid #0067b8; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;}
+		textarea{width: 100%;}
+		label{height: 28px; line-height: 28px;}
+		button{background: #e8e8e8; outline: none; border-radius: 3px; padding: 0 10px; height: 28px; width: 25%;}
 		</style>
 	</head>
 	<body>
@@ -17,7 +23,15 @@
 			<div>目前支持：zhihu头像、douban头像、OSC头像、动弹图、简书头像、封面。<br>单击事件被屏蔽，如要打开链接，可以使用右键或中键。</div>
 			<div>Version 1.0.2</div>
 		</article>
+		<article>
+			<h1>base64加密</h1>
+			<textarea cols="36" rows="3"></textarea>
+			<div class="flex-wp">
+				<label>加密次数</label><input type="number" class="text" value="1" min="1" step="1" max="1000" name="times"><button id="btnB64En">加密</button><button id="btnB64De">解密</button>
+			</div>
+		</article>
 		<footer>Powered By Jesse.2016.08</footer>
 		</div>
+		<script type="text/javascript" src="popup.js"></script>
 	</body>
 </html>
